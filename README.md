@@ -1,118 +1,53 @@
-# Shopping List App Service
+# Shopping List App
 
-A Spring Boot REST API for managing shopping lists and items. This is a **work in progress** project.
+A web application for managing shopping lists — built as a personal, independent alternative to existing shopping list apps.
 
 ## Overview
 
-A backend service that provides REST APIs for creating and managing shopping lists. The long-term goal is to pair this server with a lightweight mobile app that allows users to:
+A backend + frontend service that allows users to:
 
 - Create and manage multiple shopping lists
-- Add items to lists
+- Add, remove, and check off items
+- Name lists by purpose (e.g. groceries, hardware store, vinted)
 - Access their shopping lists from anywhere
-- Build a personal, independent alternative to existing play store shopping list apps
-
-## Features
-
-✅ **Customer Management (probably to be removed)**
-- Create an identity/customer 
-- Retrieve customer email (for use in sending reminders to shop in the future)
-
-✅ **Shopping Lists**
-- Associate list of items to shop for 
-- Can have many different shopping lists
-- Can name the list (e.g. groceries, vinted)
-
-✅ **Items**
-- Manage items database
-- Add new items (maybe with image feature)
-- Support for many-to-many relationships
-
-✅ **Database**
-- H2 in-memory database for development
-- Hibernatejpa configuration with automatic schema creation
-- PostgreSQL support (configurable)
 
 ## Tech Stack
 
-- **Java 11+**
-- **Spring Boot 3.3.0**
-- **Spring Data JPA**
-- **H2 Database** (development)
-- **PostgreSQL** (production ready)
-- **Gradle** (build tool)
-- **JUnit 5** (testing)
+| Technology | Role | Why |
+|---|---|---|
+| [Scala 3](https://docs.scala-lang.org/) | Language | Expressive, type-safe, functional-first JVM language with excellent concurrency support |
+| [sbt](https://www.scala-sbt.org/) | Build tool | The standard Scala build tool — handles compilation, dependency management, testing, and running |
+| [Play Framework 3.x](https://www.playframework.com/) | Web framework | Builds the web application and handles REST APIs. Stateless, non-blocking architecture. Hot-reloads code changes in dev mode so you see edits instantly without restarting the server |
+| [Apache Pekko](https://pekko.apache.org/) | Concurrency & streaming | Actor-based message passing for highly concurrent state management. Streams API for reactive frontend↔backend data flow. Handles backpressure, fault tolerance, and supervision out of the box |
+| [H2](https://h2database.com/) | Database (dev) | Lightweight in-memory SQL database for local development — zero setup, auto-creates on startup. May be swapped for PostgreSQL in production |
+| [ScalaTest](https://www.scalatest.org/) | Testing | The standard Scala testing framework — flexible DSL styles, rich matchers, integrates with mocking libraries |
+
+### Why Apache Pekko over Akka?
+
+Akka changed to a Business Source License (BSL) in 2022, making it non-free for production use. [Apache Pekko](https://pekko.apache.org/) is the community-maintained open-source fork (Apache 2.0 licensed), hosted by the Apache Software Foundation. Play Framework 3.x is already built on Pekko rather than Akka.
+
+### Key Features of the Stack
+
+- **Hot reload** — Play recompiles and reloads on every request in dev mode, no server restart needed
+- **Actor model** — Pekko actors provide lightweight concurrent entities that communicate via messages, avoiding shared mutable state
+- **Reactive streams** — Pekko Streams handles async data pipelines with built-in backpressure between frontend and backend
+- **Type safety** — Scala 3's type system catches errors at compile time; case classes and sealed traits model the domain precisely
+- **Non-blocking I/O** — Play and Pekko are async-first, handling many concurrent connections on few threads
+
+## Project Status
+
+🚧 **Work in progress** — migrating from a Java/Spring Boot prototype to idiomatic Scala.
 
 ## How To Run
 
 ```
-./gradlew bootRun --args='--spring.devtools.restart.enabled=true'
+sbt run
 ```
 
-## How To Use
+## Configuration
 
-#### Configuration
+Defined in `src/main/resources/application.conf` (HOCON format, used by Play/Pekko).
 
-All defined in src/main/java/resources
+## API
 
-```
-# Server Configuration
-server.port=8080
-
-# H2 In-Memory Database (auto-creates on startup)
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-
-# JPA/Hibernate Configuration
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.jpa.hibernate.ddl-auto=create-drop
-spring.jpa.show-sql=false
-
-# H2 Console (optional - view DB at http://localhost:8080/h2-console)
-spring.h2.console.enabled=true
-```
-
-- server.port is the port the server runs on
-- spring.datasource is the database connection information and driver (h2 currently)
-- spring.jpa is the DTO mapping library used
-- spring.h2 is h2 specific settings like a console to inspect the data if issues arise
-
-
-#### Customer API
-
-add new customer 
-
-```
-curl -X POST http://localhost:8080/api/v1/customer \
-  -H "Content-Type: application/json" \
-  -d '{"email":"john@example.com"}'
-```
-
-get customer info
-
-```
-curl -X GET http://localhost:8080/api/v1/customer/{id}
-```
-
-Example e2e:
-
-```
-> curl -X POST http://localhost:8080/api/v1/customer \
-  -H "Content-Type: application/json" \
-  -d '{"email":"john@example.com"}'
-john@example.com%   
-                                                                                                                                                                                             
-> curl -X GET http://localhost:8080/api/v1/customer/1 
-{"email":"john@example.com"}%     
-```
-
-#### Shopping List API
-
-TODO
-
-#### Item API
-
-TODO
-
-
+_TODO — endpoints to be defined as migration progresses._
