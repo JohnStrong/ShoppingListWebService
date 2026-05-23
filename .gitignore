@@ -44,3 +44,6 @@ bin/
 project/target
 build.log
 target/
+
+### Logs ###
+*.log
