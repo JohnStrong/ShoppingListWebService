@@ -39,23 +39,29 @@ Akka changed to a Business Source License (BSL) in 2022, making it non-free for 
 ```
 app/
 ├── controllers/
-│   └── Customer.scala          # REST endpoints
+│   ├── Customer.scala              # Customer REST endpoints
+│   └── ShoppingListController.scala # Shopping list REST endpoints
 ├── models/
-│   └── Customer.scala          # Case class + JSON format
+│   ├── Customer.scala              # Customer case class + JSON format
+│   └── ShoppingList.scala          # ShoppingListItem case class + JSON format
 ├── services/
-│   └── Customer.scala          # Service trait + in-memory impl
-└── Module.scala                # Guice DI bindings
+│   ├── Customer.scala              # Customer service trait + in-memory impl
+│   └── ShoppingList.scala          # Shopping list service trait + in-memory impl
+└── Module.scala                    # Guice DI bindings
 conf/
-├── application.conf            # Play/Pekko config (HOCON)
-├── routes                      # URL routing
-└── logback.xml                 # Logging
+├── application.conf                # Play/Pekko config (HOCON)
+├── routes                          # URL routing
+└── logback.xml                     # Logging
 test/
 ├── controllers/
-│   └── CustomerControllerSpec.scala
+│   ├── CustomerControllerSpec.scala
+│   └── ShoppingListControllerSpec.scala
 ├── models/
-│   └── CustomerModelSpec.scala
+│   ├── CustomerModelSpec.scala
+│   └── ShoppingListItemModelSpec.scala
 └── services/
-    └── CustomerServiceImplSpec.scala
+    ├── CustomerServiceImplSpec.scala
+    └── ShoppingListServiceImplSpec.scala
 ```
 
 ## How To Run
@@ -100,23 +106,55 @@ GET /api/v1/customer/:id
 | 200 | `{"id": "<uuid>", "email": "user@example.com"}` |
 | 404 | `{"error": "Customer with id ... not found."}` |
 
-### Example
+### Get Shopping List
+
+```
+GET /api/v1/shopping-list/:email
+```
+
+| Status | Response |
+|--------|----------|
+| 200 | `[{"name": "Milk", "quantity": 2}, {"name": "Bread", "quantity": 1}]` |
+| 404 | `{"error": "No shopping list found for email ..."}` |
+
+### Examples
 
 ```bash
-# Create
+# Create a customer
 curl -X POST http://localhost:9000/api/v1/customer \
   -H "Content-Type: application/json" \
   -d '{"email":"hello@example.com"}'
 
-# Get (use id from create response)
+# Get customer (use id from create response)
 curl http://localhost:9000/api/v1/customer/<uuid>
+
+# Get shopping list for a customer
+curl http://localhost:9000/api/v1/shopping-list/hello@example.com
 ```
+
+## How To Test
+
+### Unit tests
+
+```bash
+sbt test
+```
+
+### Manual testing
+
+Start the server:
+
+```bash
+sbt run
+```
+
+Then use curl against **http://localhost:9000** as shown in the examples above.
 
 ## Project Status
 
 🚧 **Work in progress** — next steps:
 
-- Shopping list and item endpoints
+- Add/remove items from shopping lists
 - Persistent database (H2 → PostgreSQL)
 - Pekko actors for concurrent state management
 - Frontend integration with Pekko Streams
