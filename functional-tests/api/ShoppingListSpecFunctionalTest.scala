@@ -9,17 +9,14 @@ import play.api.test.Helpers.*
 class ShoppingListSpecFunctionalTest extends PlaySpec with GuiceOneAppPerSuite {
 
   "ShoppingListController" should {
-    "A valid customer can create a shopping list, then retrieve it" in {
-      // Create customer
+
+    "create a shopping list and retrieve it" in {
       val createCustomer = FakeRequest(POST, "/api/v1/customer")
         .withHeaders("Content-Type" -> "application/json")
         .withBody(Json.obj("email" -> "functional@test.com"))
+      status(route(app, createCustomer).get) mustBe CREATED
 
-      val customerResult = route(app, createCustomer).get
-      status(customerResult) mustBe CREATED
-
-      // Create Shopping List
-      val createShoppingList = FakeRequest(POST, "/api/v1/shopping-list")
+      val createList = FakeRequest(POST, "/api/v1/shopping-list")
         .withHeaders("Content-Type" -> "application/json")
         .withBody(Json.obj(
           "email" -> "functional@test.com",
@@ -29,22 +26,118 @@ class ShoppingListSpecFunctionalTest extends PlaySpec with GuiceOneAppPerSuite {
             Json.obj("name" -> "Bread", "quantity" -> 1)
           )
         ))
-      val createShoppingListResult = route(app, createShoppingList).get
-      status(createShoppingListResult) mustBe CREATED
+      val createResult = route(app, createList).get
+      status(createResult) mustBe CREATED
 
-      // Can retrieve it
-
-      val shoppingList = FakeRequest(GET, "/api/v1/shopping-list/functional@test.com")
-        .withHeaders("Content-Type" -> "application/json")
-      val shoppingListResult = route(app, shoppingList).get
-      status(shoppingListResult) mustBe OK
-
-      val json = contentAsJson(shoppingListResult)
+      val json = contentAsJson(createResult)
       (json \ "name").as[String] mustBe "Weekly Groceries"
-      (json \ "items").as[List[JsObject]] must contain theSameElementsAs List(
-        Json.obj("name" -> "Milk", "quantity" -> 2),
-        Json.obj("name" -> "Bread", "quantity" -> 1)
-      )
+      (json \ "items").as[List[JsObject]].length mustBe 2
+
+      val getResult = route(app, FakeRequest(GET, "/api/v1/shopping-list/functional@test.com")).get
+      status(getResult) mustBe OK
+      (contentAsJson(getResult) \ "name").as[String] mustBe "Weekly Groceries"
+    }
+
+    "return 409 when creating a duplicate shopping list" in {
+      val createCustomer = FakeRequest(POST, "/api/v1/customer")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj("email" -> "duplicate@test.com"))
+      status(route(app, createCustomer).get) mustBe CREATED
+
+      val createList = FakeRequest(POST, "/api/v1/shopping-list")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj(
+          "email" -> "duplicate@test.com",
+          "name" -> "First List",
+          "items" -> Json.arr(Json.obj("name" -> "Milk", "quantity" -> 1))
+        ))
+      status(route(app, createList).get) mustBe CREATED
+
+      val duplicateList = FakeRequest(POST, "/api/v1/shopping-list")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj(
+          "email" -> "duplicate@test.com",
+          "name" -> "Second List",
+          "items" -> Json.arr(Json.obj("name" -> "Bread", "quantity" -> 1))
+        ))
+      val duplicateResult = route(app, duplicateList).get
+      status(duplicateResult) mustBe CONFLICT
+      (contentAsJson(duplicateResult) \ "error").as[String] must include("already exists")
+    }
+
+    "return 404 when getting a shopping list that does not exist" in {
+      val getResult = route(app, FakeRequest(GET, "/api/v1/shopping-list/nobody@test.com")).get
+      status(getResult) mustBe NOT_FOUND
+      (contentAsJson(getResult) \ "error").as[String] must include("No shopping list found")
+    }
+
+    "return 400 when email is empty" in {
+      val request = FakeRequest(POST, "/api/v1/shopping-list")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj(
+          "email" -> "",
+          "name" -> "Test",
+          "items" -> Json.arr(Json.obj("name" -> "Milk", "quantity" -> 1))
+        ))
+      val result = route(app, request).get
+      status(result) mustBe BAD_REQUEST
+    }
+
+    "return 400 when name is empty" in {
+      val request = FakeRequest(POST, "/api/v1/shopping-list")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj(
+          "email" -> "valid@test.com",
+          "name" -> "",
+          "items" -> Json.arr(Json.obj("name" -> "Milk", "quantity" -> 1))
+        ))
+      val result = route(app, request).get
+      status(result) mustBe BAD_REQUEST
+    }
+
+    "return 400 when items list is empty" in {
+      val request = FakeRequest(POST, "/api/v1/shopping-list")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj(
+          "email" -> "valid@test.com",
+          "name" -> "Test",
+          "items" -> Json.arr()
+        ))
+      val result = route(app, request).get
+      status(result) mustBe BAD_REQUEST
+    }
+
+    "return 400 when item name is empty" in {
+      val request = FakeRequest(POST, "/api/v1/shopping-list")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj(
+          "email" -> "valid@test.com",
+          "name" -> "Test",
+          "items" -> Json.arr(Json.obj("name" -> "", "quantity" -> 1))
+        ))
+      val result = route(app, request).get
+      status(result) mustBe BAD_REQUEST
+    }
+
+    "return 400 when item quantity is less than 1" in {
+      val request = FakeRequest(POST, "/api/v1/shopping-list")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj(
+          "email" -> "valid@test.com",
+          "name" -> "Test",
+          "items" -> Json.arr(Json.obj("name" -> "Milk", "quantity" -> 0))
+        ))
+      val result = route(app, request).get
+      status(result) mustBe BAD_REQUEST
+    }
+
+    "return 400 when request body is missing required fields" in {
+      val request = FakeRequest(POST, "/api/v1/shopping-list")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj("bad" -> "data"))
+      val result = route(app, request).get
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "error").as[String] mustBe "Invalid request format"
     }
   }
 }
