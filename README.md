@@ -39,7 +39,7 @@ Akka changed to a Business Source License (BSL) in 2022, making it non-free for 
 ```
 app/
 ├── controllers/
-│   ├── Customer.scala                          # Customer REST endpoints
+│   ├── CustomerController.scala                # Customer REST endpoints
 │   └── ShoppingListController.scala            # Shopping list REST endpoints
 ├── models/
 │   ├── Customer.scala                          # Customer case class + JSON format
@@ -67,7 +67,8 @@ test/
     └── ShoppingListServiceImplSpec.scala
 functional-tests/
 └── api/
-    └── ShoppingListSpecFunctionalTest.scala    # End-to-end API tests
+    ├── CustomerServiceFunctionalTest.scala     # Customer API end-to-end tests
+    └── ShoppingListFunctionalTest.scala        # Shopping list API end-to-end tests
 ```
 
 ## How To Run
