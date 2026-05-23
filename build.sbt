@@ -15,7 +15,10 @@ lazy val root = (project in file("."))
       guice,
       "org.scalatest" %% "scalatest" % "3.2.20" % Test,
       "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % Test,
-      "org.mockito" % "mockito-core" % "5.22.0" % Test
+      "org.mockito" % "mockito-core" % "5.22.0" % Test,
+      jdbc,                                           // Play JDBC module (provides Database injection)
+      "com.h2database" % "h2" % "2.2.224",            // H2 driver
+      evolutions                                      // Play Evolutions for schema management
     ),
     // Functional test configuration - run with sbt functional:test
     inConfig(FunctionalTest)(Defaults.testSettings),
