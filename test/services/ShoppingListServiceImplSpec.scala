@@ -8,11 +8,11 @@ class ShoppingListServiceImplSpec extends AnyWordSpec with Matchers {
 
   private def freshService() = new ShoppingListServiceImpl()
 
-  "getAllShoppingLists" should {
+  "getShoppingListItems" should {
 
     "return Left with error when no list exists for email" in {
       val service = freshService()
-      val result = service.getAllShoppingLists("unknown@example.com")
+      val result = service.getShoppingListItems("unknown@example.com")
 
       result shouldBe a[Left[_, _]]
       result.left.toOption.get should include("No shopping list found")

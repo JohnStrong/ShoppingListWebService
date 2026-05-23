@@ -27,7 +27,7 @@ class ShoppingListControllerSpec extends AnyWordSpec with Matchers {
 
     "return 200 with shopping list JSON when found" in {
       val (controller, mockService) = createFixture()
-      when(mockService.getAllShoppingLists("user@example.com")).thenReturn(Right(testItems))
+      when(mockService.getShoppingListItems("user@example.com")).thenReturn(Right(testItems))
 
       val result = controller.getShoppingList("user@example.com").apply(FakeRequest())
 
@@ -40,7 +40,7 @@ class ShoppingListControllerSpec extends AnyWordSpec with Matchers {
 
     "return 404 when no shopping list exists" in {
       val (controller, mockService) = createFixture()
-      when(mockService.getAllShoppingLists("nobody@example.com"))
+      when(mockService.getShoppingListItems("nobody@example.com"))
         .thenReturn(Left("No shopping list found for email nobody@example.com."))
 
       val result = controller.getShoppingList("nobody@example.com").apply(FakeRequest())

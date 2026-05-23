@@ -14,7 +14,7 @@ class ShoppingListController @Inject()(
 ) extends BaseController {
 
   def getShoppingList(email: String): Action[AnyContent] = Action {
-    service.getAllShoppingLists(email) match {
+    service.getShoppingListItems(email) match {
       case Left(errorMessage) => NotFound(Json.obj("error" -> errorMessage))
       case Right(shoppingList) => Ok(Json.toJson(shoppingList))
     }
