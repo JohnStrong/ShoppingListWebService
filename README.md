@@ -53,6 +53,9 @@ app/
 └── Module.scala                                # Guice DI bindings
 conf/
 ├── application.conf                            # Play/Pekko config (HOCON)
+├── evolutions/
+│   └── default/
+│       └── 1.sql                               # Initial schema (customers, lists, items)
 ├── routes                                      # URL routing
 └── logback.xml                                 # Logging
 test/
