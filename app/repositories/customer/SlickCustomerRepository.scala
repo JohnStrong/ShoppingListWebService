@@ -34,4 +34,21 @@ class SlickCustomerRepository @Inject()(
 
     db.run(action)
   }
+
+  override def findByIdentifier(id: String): Future[Either[String, Customer]] = {
+    val action = customers.filter(_.email === id)
+      .result
+      /*
+        headOption gives you a DBIO[Option[Customer]]
+       */
+      .headOption
+      /*
+        map for transforming DBIO[Option[Customer]] to DBIO[Either] as per the interface
+       */
+      .map {
+        case Some(customer) => Right(customer)
+        case None => Left(s"Customer with email '$id' not found.")
+      }
+    db.run(action)
+  }
 }
