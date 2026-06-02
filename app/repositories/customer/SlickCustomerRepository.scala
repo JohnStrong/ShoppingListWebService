@@ -23,7 +23,7 @@ class SlickCustomerRepository @Inject()(
 
   override def create(payload: Customer): Future[Either[String, Customer]] = {
     val action = customers.filter(_.email === payload.email)
-      .forUpdate // SELECT ... FOR UPDATE =>  locks the row
+      .forUpdate // SELECT ... FOR UPDATE =>  locks the row (pessimistic locking)
       .result
       .headOption
       .flatMap {
@@ -37,6 +37,7 @@ class SlickCustomerRepository @Inject()(
 
   override def findByIdentifier(id: String): Future[Either[String, Customer]] = {
     val action = customers.filter(_.email === id)
+      // no locking - eventually consistent
       .result
       /*
         headOption gives you a DBIO[Option[Customer]]
