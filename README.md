@@ -374,3 +374,36 @@ Then use curl against **http://localhost:9000** as shown in the examples above.
 - Persistent database (H2 → PostgreSQL)
 - Pekko actors for concurrent state management
 - Frontend integration with Pekko Streams
+
+### Planned RESTful API Improvements
+
+#### Current API (v0.1) — Deprecated
+
+| Method | Endpoint | Issue |
+|--------|----------|-------|
+| `POST` | `/api/v1/shopping-list` | Top-level resource implies shopping lists exist independently; email buried in request body |
+| `GET` | `/api/v1/shopping-list/:email` | Flat structure can't distinguish "get all lists" from "get one list"; no path to CRUD by name |
+
+#### Planned API
+
+Shopping lists are always scoped under customers — they don't exist as an independent resource:
+
+```
+POST   /api/v1/customers                                   # create customer
+GET    /api/v1/customers/:email                            # get customer
+
+POST   /api/v1/customers/:email/shopping-lists             # create a list
+GET    /api/v1/customers/:email/shopping-lists             # get all lists for customer
+GET    /api/v1/customers/:email/shopping-lists/:name       # get one list by name
+PUT    /api/v1/customers/:email/shopping-lists/:name       # update a list
+DELETE /api/v1/customers/:email/shopping-lists/:name       # delete a list
+```
+
+**Why this is better:**
+
+- **Hierarchy is explicit** — the URL path makes ownership clear (list belongs to customer)
+- **No top-level orphan** — shopping lists don't exist outside the context of a customer
+- **Supports many lists per customer** — the collection endpoint returns all lists; individual lists are addressed by name
+- **Composite key in the URL** — `email + name` uniquely identifies a list without exposing internal IDs
+- **Standard REST semantics** — plural nouns, collection vs item distinction, HTTP verbs map directly to CRUD operations
+- **Email moves out of the request body** — the parent resource path provides context; the body only contains the list payload
