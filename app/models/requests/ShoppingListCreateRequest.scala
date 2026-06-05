@@ -11,7 +11,11 @@ case class ShoppingListCreateRequest(
 
 object ShoppingListCreateRequest {
   implicit val reads: Reads[ShoppingListCreateRequest] = (
-    (__ \ "name").read[String](Reads.minLength[String](1)) and
-    (__ \ "items").read[List[ShoppingListItem]](Reads.minLength[List[ShoppingListItem]](1))
+    (__ \ "name").read[String](
+      Reads.minLength[String](1) keepAnd Reads.maxLength[String](20)
+    ) and
+    (__ \ "items").read[List[ShoppingListItem]](
+      Reads.minLength[List[ShoppingListItem]](1) keepAnd Reads.maxLength[List[ShoppingListItem]](50)
+    )
   )(ShoppingListCreateRequest.apply _)
 }

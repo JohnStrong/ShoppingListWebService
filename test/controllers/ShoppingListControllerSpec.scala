@@ -179,5 +179,34 @@ class ShoppingListControllerSpec extends AnyWordSpec with Matchers {
 
       status(result) shouldBe BAD_REQUEST
     }
+
+    "return 400 when name exceeds 20 characters" in {
+      val (controller, _) = createFixture()
+
+      val request = FakeRequest(POST, "/")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj(
+          "name" -> "a" * 21,
+          "items" -> Json.arr(Json.obj("name" -> "Milk", "quantity" -> 1))
+        ))
+      val result = call(controller.create("user@example.com"), request)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+
+    "return 400 when items list exceeds 50 items" in {
+      val (controller, _) = createFixture()
+
+      val items = (1 to 51).map(i => Json.obj("name" -> s"Item $i", "quantity" -> 1))
+      val request = FakeRequest(POST, "/")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj(
+          "name" -> "Groceries",
+          "items" -> Json.toJson(items)
+        ))
+      val result = call(controller.create("user@example.com"), request)
+
+      status(result) shouldBe BAD_REQUEST
+    }
   }
 }

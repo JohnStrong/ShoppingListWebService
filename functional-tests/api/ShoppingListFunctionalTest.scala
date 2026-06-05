@@ -120,5 +120,28 @@ class ShoppingListFunctionalTest extends PlaySpec with GuiceOneAppPerSuite {
       status(result) mustBe BAD_REQUEST
       (contentAsJson(result) \ "error").as[String] mustBe "Invalid request format"
     }
+
+    "return 400 when name exceeds 20 characters" in {
+      val request = FakeRequest(POST, "/api/v1/customers/valid@test.com/shopping-lists")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj(
+          "name" -> "a" * 21,
+          "items" -> Json.arr(Json.obj("name" -> "Milk", "quantity" -> 1))
+        ))
+      val result = route(app, request).get
+      status(result) mustBe BAD_REQUEST
+    }
+
+    "return 400 when items list exceeds 50 items" in {
+      val items = (1 to 51).map {i => Json.obj("name" -> s"Item $i", "quantity" -> 1)}
+      val request = FakeRequest(POST, "/api/v1/customers/valid@test.com/shopping-lists")
+        .withHeaders("Content-Type" -> "application/json")
+        .withBody(Json.obj(
+          "name" -> "Test",
+          "items" -> Json.arr(items)
+        ))
+      val result = route(app, request).get
+      status(result) mustBe BAD_REQUEST
+    }
   }
 }
