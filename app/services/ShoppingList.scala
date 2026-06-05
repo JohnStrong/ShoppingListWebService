@@ -8,7 +8,11 @@ import scala.concurrent.Future
 import javax.inject.*
 
 trait ShoppingListService {
+  @Deprecated("use getShoppingLists instead")
   def getShoppingList(email: String): Future[Either[String, ShoppingListWithItems]]
+
+  def getShoppingLists(email: String): Future[Either[String, List[ShoppingListWithItems]]]
+
   def create(email: String, name: String, items: List[ShoppingListItem]): Future[Either[String, ShoppingListWithItems]]
 }
 
@@ -18,6 +22,10 @@ class ShoppingListServiceImpl @Inject()(
 
   override def getShoppingList(email: String): Future[Either[String, ShoppingListWithItems]] = {
     shoppingListRepository.findByIdentifier(email)
+  }
+
+  override def getShoppingLists(email: String): Future[Either[String, List[ShoppingListWithItems]]] = {
+    shoppingListRepository.findAllByIdentifier(email)
   }
 
   override def create(email: String, name: String, items: List[ShoppingListItem]): Future[Either[String, ShoppingListWithItems]] = {

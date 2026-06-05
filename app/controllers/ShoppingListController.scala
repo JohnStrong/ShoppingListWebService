@@ -14,8 +14,16 @@ class ShoppingListController @Inject()(
   val service: ShoppingListService
 )(implicit ec: ExecutionContext) extends BaseController {
 
+  @Deprecated
   def getShoppingList(email: String): Action[AnyContent] = Action.async {
     service.getShoppingList(email) map {
+      case Left(errorMessage) => NotFound(Json.obj("error" -> errorMessage))
+      case Right(shoppingList) => Ok(Json.toJson(shoppingList))
+    }
+  }
+
+  def getShoppingLists(email: String): Action[AnyContent] = Action.async {
+    service.getShoppingLists(email) map {
       case Left(errorMessage) => NotFound(Json.obj("error" -> errorMessage))
       case Right(shoppingList) => Ok(Json.toJson(shoppingList))
     }

@@ -36,4 +36,6 @@ class ShoppingListRepository extends InMemoryDataRepository[String, ShoppingList
       repo.get(id).toRight(s"No shopping list found for email $id.")
     }
   }
+
+  override def findAllByIdentifier(id: String): Future[Either[String, List[ShoppingList]]] = ???
 }

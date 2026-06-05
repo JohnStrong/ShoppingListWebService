@@ -52,4 +52,6 @@ class SlickCustomerRepository @Inject()(
       }
     db.run(action)
   }
+
+  override def findAllByIdentifier(id: String): Future[Either[String, List[Customer]]] = ???
 }

@@ -31,4 +31,12 @@ trait DataRepository[IDENTIFIER, ENTITY] {
    * @return a Future containing Right(entity) if found, or Left(errorMessage) if not
    */
   def findByIdentifier(id: IDENTIFIER): Future[Either[String, ENTITY]]
+
+  /**
+   * Look up all entities by some column identifier/filter.
+   *
+   * @param id the identifier to search by
+   * @return a Future containing Right(list(entity)) if found, or Left(errorMessage) if not
+   */
+  def findAllByIdentifier(id: IDENTIFIER): Future[Either[String, List[ENTITY]]]
 }

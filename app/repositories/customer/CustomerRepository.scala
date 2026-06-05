@@ -35,4 +35,6 @@ class CustomerRepository extends InMemoryDataRepository[String, Customer] {
         .toRight(s"Customer with email '$id' not found.")
     }
   }
+
+  override def findAllByIdentifier(id: String): Future[Either[String, List[Customer]]] = ???
 }
