@@ -227,7 +227,7 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY target/universal/stage/ .
 EXPOSE 9000
-CMD ["bin/shopping-list-app", "-Dplay.http.secret.key=${APPLICATION_SECRET}"]
+CMD ["bin/smeckles-web-app", "-Dplay.http.secret.key=${APPLICATION_SECRET}"]
 ```
 
 ### Fly deployment commands

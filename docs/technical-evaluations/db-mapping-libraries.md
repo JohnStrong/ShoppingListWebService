@@ -1,6 +1,6 @@
 # DB Mapping Library Evaluation
 
-Evaluation of database mapping/ORM libraries for the Shopping List App (Play 3.x + Scala 3 + H2 dev / PostgreSQL production).
+Evaluation of database mapping/ORM libraries for SmecklesWebApp (Play 3.x + Scala 3 + H2 dev / PostgreSQL production).
 
 ## Requirements
 

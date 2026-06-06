@@ -1,6 +1,6 @@
-# Shopping List App
+# SmecklesWebApp
 
-A web application for managing shopping lists — built as a personal, independent alternative to existing shopping list apps.
+A personal budgeting companion that grows with you — from simple shopping lists to full expense tracking.
 
 ## Table of Contents
 
