@@ -4,6 +4,6 @@ GET     /api/v1/customers/:email controllers.CustomerController.getCustomerByEma
 POST    /api/v1/customers        controllers.CustomerController.createCustomer()
 
 # Get all shopping list items for a customer
-GET     /api/v1/customers/:email/shopping-lists    controllers.ShoppingListController.getShoppingList(email: String)
+GET     /api/v1/customers/:email/shopping-lists    controllers.ShoppingListController.getShoppingLists(email: String)
 # Create a new shopping list for a customer
 POST    /api/v1/customers/:email/shopping-lists    controllers.ShoppingListController.create(email: String)
