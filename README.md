@@ -15,7 +15,7 @@ A web application for managing shopping lists — built as a personal, independe
   - [Create Customer](#create-customer)
   - [Get Customer by Email](#get-customer-by-email)
   - [Create Shopping List](#create-shopping-list)
-  - [Get Shopping List](#get-shopping-list)
+  - [Get Shopping Lists](#get-shopping-lists)
   - [Examples](#examples)
 - [Database Configuration](#database-configuration)
   - [Per-Environment Configuration](#per-environment-configuration)
@@ -227,7 +227,7 @@ Validation rules:
 | 400 | `{"error": "Invalid request format", "details": {...}}` — validation failure with field-level errors |
 | 409 | `{"error": "Shopping list already exists for email ..."}` |
 
-### Get Shopping List
+### Get Shopping Lists
 
 ```
 GET /api/v1/customers/:email/shopping-lists
@@ -235,8 +235,8 @@ GET /api/v1/customers/:email/shopping-lists
 
 | Status | Response |
 |--------|----------|
-| 200 | `{"email": "user@example.com", "name": "Weekly Groceries", "items": [{"name": "Milk", "quantity": 2}, {"name": "Bread", "quantity": 1}]}` |
-| 404 | `{"error": "No shopping list found for email ..."}` |
+| 200 | `[{"email": "user@example.com", "name": "Weekly Groceries", "items": [{"name": "Milk", "quantity": 2}, {"name": "Bread", "quantity": 1}]}]` |
+| 500 | `{"error": "..."}` — unexpected server error |
 
 ### Examples
 
@@ -254,7 +254,7 @@ curl -X POST http://localhost:9000/api/v1/customers/hello@example.com/shopping-l
   -H "Content-Type: application/json" \
   -d '{"name":"Weekly Groceries","items":[{"name":"Milk","quantity":2},{"name":"Bread","quantity":1}]}'
 
-# Get shopping list for a customer
+# Get all shopping lists for a customer
 curl http://localhost:9000/api/v1/customers/hello@example.com/shopping-lists
 ```
 
