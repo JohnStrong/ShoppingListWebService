@@ -34,7 +34,9 @@ class ShoppingListFunctionalTest extends PlaySpec with GuiceOneAppPerSuite {
 
       val getResult = route(app, FakeRequest(GET, "/api/v1/customers/functional@test.com/shopping-lists")).get
       status(getResult) mustBe OK
-      (contentAsJson(getResult) \ "name").as[String] mustBe "Weekly Groceries"
+      val lists = contentAsJson(getResult).as[List[JsObject]]
+      lists.length mustBe 1
+      (lists.head \ "name").as[String] mustBe "Weekly Groceries"
     }
 
     "return 409 when creating a duplicate shopping list" in {
@@ -62,10 +64,10 @@ class ShoppingListFunctionalTest extends PlaySpec with GuiceOneAppPerSuite {
       (contentAsJson(duplicateResult) \ "error").as[String] must include("already exists")
     }
 
-    "return 404 when getting a shopping list that does not exist" in {
+    "return empty list when no shopping lists exist for email" in {
       val getResult = route(app, FakeRequest(GET, "/api/v1/customers/nobody@test.com/shopping-lists")).get
-      status(getResult) mustBe NOT_FOUND
-      (contentAsJson(getResult) \ "error").as[String] must include("No shopping list found")
+      status(getResult) mustBe OK
+      contentAsJson(getResult).as[List[JsObject]] mustBe empty
     }
 
     "return 400 when name is empty" in {
